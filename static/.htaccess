@@ -3,9 +3,9 @@ Options -Indexes
 
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteCond %{HTTPS} !=on [OR]
-RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteCond %{HTTP_HOST} ^www\.landrytchouela\.com$ [NC]
 RewriteRule ^ https://landrytchouela.com%{REQUEST_URI} [L,R=301]
+RewriteRule (^|/)\.git(/|$) - [F,L]
 # Anciennes pages du Website Builder
 RewriteRule ^(portfolio|skills|contact)/?$ / [L,R=301]
 RewriteRule ^fr(/.*)?$ /?lang=fr [L,R=301]
