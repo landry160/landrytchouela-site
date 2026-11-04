@@ -177,6 +177,7 @@ export const about = {
     { k: { fr: 'Leadership', en: 'Leadership' }, v: { fr: 'Chef de l’Équipe 29 (7 personnes) et chef de quart chez McDonald’s depuis 2020, avec des équipes de 5 à 20 personnes', en: 'Lead of Team 29 (7 people) and shift manager at McDonald’s since 2020, with teams of 5 to 20 people' } },
     { k: { fr: 'Distinction', en: 'Award' }, v: { fr: 'Bourse de la Commission des partenaires du marché du travail (2022)', en: 'Commission des partenaires du marché du travail scholarship (2022)' } },
     { k: { fr: 'Langues', en: 'Languages' }, v: { fr: 'Français (langue maternelle), anglais technique (immersion à l’Université Brock, 2021)', en: 'French (native), technical English (immersion at Brock University, 2021)' } },
+    { k: { fr: 'En dehors du code', en: 'Outside of code' }, v: { fr: 'Soccer, guitare, musculation et cybersécurité', en: 'Soccer, guitar, weight training and cybersecurity' } },
   ],
 };
 
