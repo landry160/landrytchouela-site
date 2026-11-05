@@ -126,6 +126,7 @@ const dialogs = allProjects.map(p => { const c = cases[p.name]; return `
     ${list(L('Décisions', 'Decisions'), c.decisions)}
     ${list(L('Défis résolus', 'Challenges solved'), c.challenges || (p.fixed ?? null))}
     ${c.outcome ? `<section><h3>${L('Où ça en est', 'Where it stands')}</h3><p>${T(c.outcome)}</p></section>` : ''}
+    ${p.link ? `<a class="btn btn-ghost" href="${p.link.href}" target="_blank" rel="noopener">${icon('github')}${T(p.link.label)}</a>` : ''}
   </div>
 </dialog>`; }).join('');
 
@@ -156,6 +157,7 @@ const projectsS = `
 <section class="section" id="projets"><div class="wrap">
   <h2 class="h2">${L('Projets', 'Projects')}</h2>
   <p class="lede">${L('Du firmware temps réel à l’application d’IA, avec les vrais chiffres et les vrais problèmes.', 'From real-time firmware to AI applications, with the real numbers and the real problems.')}</p>
+  <a class="btn btn-ghost projects-gh" href="${site.github}?tab=repositories" target="_blank" rel="noopener">${icon('github')}${L('Tous mes dépôts GitHub', 'All my GitHub repos')}</a>
   <div class="tiles">${flagTile}${projects.map(projTile).join('')}</div>
   <div class="others glass">
     ${others.map(o => `<div class="other"><h4>${T(o.name)}</h4><span class="when">${T(o.when)}</span><p>${T(o.desc)}</p></div>`).join('')}
@@ -223,6 +225,7 @@ const contact = `
 const foot = `
 <footer class="wrap"><div class="foot">
   <span>© ${new Date().getFullYear()} Landry Tchouela</span>
+  <a href="${site.github}/landrytchouela-site" target="_blank" rel="noopener">${L('Code source du site', 'Site source code')}</a>
   <span>${L('Mis à jour en ', 'Updated ')}${T(site.updated)}</span>
 </div></footer>`;
 

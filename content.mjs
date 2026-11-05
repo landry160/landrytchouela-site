@@ -100,12 +100,12 @@ export const flagship = {
 export const projects = [
   {
     name: 'Industrial RAG Assistant', tone: 'violet',
-    status: { fr: 'En développement', en: 'In development' },
+    status: { fr: 'Projet personnel', en: 'Personal project' },
     desc: {
-      fr: 'Une application qui répond aux questions techniques à partir de manuels, de procédures et de fiches techniques, en citant les passages sources.',
-      en: 'An app that answers technical questions from manuals, procedures and datasheets, with citations to the source passages.',
+      fr: 'Une application qui répond aux questions techniques à partir de manuels, de procédures et de fiches techniques. Chaque réponse cite ses sources, et l’assistant dit quand l’information n’est pas dans les documents.',
+      en: 'An app that answers technical questions from manuals, procedures and datasheets. Every answer cites its sources, and the assistant says when the information is not in the documents.',
     },
-    tags: ['Next.js', 'FastAPI', 'pgvector', 'Docker'],
+    tags: ['Next.js', 'FastAPI', 'pgvector', 'Gemini', 'Docker'],
     link: { href: 'https://github.com/landry160/industrial-rag-assistant', label: { fr: 'Voir le dépôt GitHub', en: 'View the GitHub repo' } },
   },
   {
@@ -213,15 +213,17 @@ export const cases = {
     flow: [
       { t: 'Documents', d: { fr: 'Manuels, procédures, fiches', en: 'Manuals, procedures, datasheets' } },
       { t: { fr: 'Ingestion', en: 'Ingestion' }, d: 'FastAPI' },
-      { t: { fr: 'Recherche vectorielle', en: 'Vector search' }, d: 'PostgreSQL, pgvector' },
-      { t: { fr: 'Réponse citée', en: 'Cited answer' }, d: 'Next.js' },
+      { t: { fr: 'Recherche hybride', en: 'Hybrid search' }, d: 'PostgreSQL, pgvector' },
+      { t: { fr: 'Réponse citée', en: 'Cited answer' }, d: 'Gemini, Next.js' },
     ],
     decisions: [
       { fr: 'Définir d’abord les frontières des services, le modèle de données et les contrats d’API v1 : ingest, ask et health.', en: 'Define service boundaries, the data model and the v1 API contracts first: ingest, ask and health.' },
       { fr: 'Faire tourner tous les services avec Docker Compose.', en: 'Run all services through Docker Compose.' },
-      { fr: 'Rendre chaque réponse vérifiable en citant les passages sources.', en: 'Make every answer verifiable by citing its source passages.' },
+      { fr: 'Rendre chaque réponse vérifiable : l’API contrôle les citations et écarte une réponse sans source valide.', en: 'Make every answer verifiable: the API checks the citations and discards an answer with no valid source.' },
+      { fr: 'Combiner recherche vectorielle, texte français et codes exacts, parce que les embeddings gèrent mal une référence comme T88-PROBE-02.', en: 'Combine vector search, French full-text and exact codes, because embeddings handle a reference like T88-PROBE-02 poorly.' },
+      { fr: 'Refuser de répondre sous un seuil de pertinence plutôt que d’inventer.', en: 'Decline to answer below a relevance threshold rather than make something up.' },
     ],
-    outcome: { fr: 'Le pipeline d’ingestion, de recherche et de génération citée est en cours de développement. Le déploiement est visé pour décembre 2026.', en: 'The ingestion, retrieval and cited-generation pipeline is in development. Deployment is targeted for December 2026.' },
+    outcome: { fr: 'Le pipeline complet fonctionne : ingestion PDF, recherche hybride, réponses citées et évaluation automatisée dans l’intégration continue. Sur un petit corpus de 3 documents, le bon passage arrive en premier pour 12 questions sur 12.', en: 'The full pipeline works: PDF ingestion, hybrid search, cited answers and automated evaluation in CI. On a small corpus of 3 documents, the right passage ranks first for 12 questions out of 12.' },
   },
   GeoForce: {
     id: 'geoforce', tone: 'green',
