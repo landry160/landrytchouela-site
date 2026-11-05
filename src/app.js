@@ -13,14 +13,14 @@
     fr: {
       ready: 'Prêt à transmettre', tx: 'Transmission en cours', fail: 'CRC invalide : erreur détectée',
       retx: 'Retransmission demandée', ok: 'Message reçu intact', preamble: 'Préambule', len: 'Longueur', data: 'Données', crc: 'CRC-16',
-      copied: 'Courriel copié', copyFail: 'Copie impossible : sélectionnez l’adresse ci-dessus', ph: 'Tapez un mot', empty: 'Tapez au moins un caractère',
+      copied: 'Courriel copié', copyFail: 'Copie impossible : sélectionnez l’adresse ci-dessus', ph: 'Tapez un mot', empty: 'Tapez au moins un caractère', emptyq: 'Tapez une question',
       title: 'Landry Tchouela | Génie informatique, logiciel et IA',
       desc: 'Portfolio de Landry Tchouela, étudiant en génie informatique à l’Université de Sherbrooke : logiciel, IA et systèmes intelligents, du capteur au produit.',
     },
     en: {
       ready: 'Ready to transmit', tx: 'Transmitting', fail: 'Invalid CRC: error detected',
       retx: 'Retransmission requested', ok: 'Message received intact', preamble: 'Preamble', len: 'Length', data: 'Data', crc: 'CRC-16',
-      copied: 'Email copied', copyFail: 'Copy failed: select the address above', ph: 'Type a word', empty: 'Type at least one character',
+      copied: 'Email copied', copyFail: 'Copy failed: select the address above', ph: 'Type a word', empty: 'Type at least one character', emptyq: 'Type a question',
       title: 'Landry Tchouela | Computer engineering, software and AI',
       desc: 'Portfolio of Landry Tchouela, computer engineering student at Université de Sherbrooke: software, AI and intelligent systems, from sensor to product.',
     },
@@ -320,6 +320,87 @@
       toast(tr('copyFail'));
     }
   });
+
+  /* Études de cas */
+  $$('[data-case]').forEach(b => b.addEventListener('click', () => {
+    const d = $('#case-' + b.dataset.case);
+    d.showModal(); d.scrollTop = 0;
+  }));
+  $$('dialog.case').forEach(d => {
+    $('.case-close', d).addEventListener('click', () => d.close());
+    d.addEventListener('click', e => { if (e.target === d) d.close(); });
+  });
+
+  /* Recherche dans le parcours : BM25 sur le texte du site */
+  const Ask = (() => {
+    const kb = JSON.parse($('#kb').textContent);
+    const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’']/g, ' ');
+    const STOP = new Set('a au aux avec ce ces chez temps time dans de des du en et il elle est faisait fait je la le les leur mes mon ou par pas pour qu que quel quelle quels quelles qui sa se son sur un une vos votre vous a t what did does do he has have his in is it of on or the to with how at an and are'.split(' '));
+    const SYN = {
+      ia: ['ia', 'generative', 'rag', 'mlops', 'pgvector', 'vision'], ai: ['ai', 'generative', 'rag', 'mlops', 'pgvector', 'vision'],
+      dirige: ['chef', 'equipe', 'equipes'], diriger: ['chef', 'equipe', 'equipes'], leadership: ['chef', 'equipe', 'lead'], led: ['lead', 'manager', 'team', 'teams'],
+      embarque: ['esp32', 'freertos', 'firmware'], embedded: ['esp32', 'freertos', 'firmware'], reel: ['reel', 'esp32', 'freertos'], real: ['real', 'esp32', 'freertos'],
+      cloud: ['docker', 'api'], web: ['react', 'node', 'angular', 'next'], backend: ['backend', 'api', 'fastapi'],
+    };
+    const words = s => norm(s).match(/[a-z0-9#+.]+/g)?.map(w => w.replace(/\.$/, '')).filter(Boolean) || [];
+    const stem = w => w.length > 5 ? w.slice(0, 5) : w;
+    const docs = { fr: [], en: [] }, df = { fr: {}, en: {} };
+    for (const l of ['fr', 'en']) {
+      for (const d of kb) {
+        const toks = words(d.t[l] + ' ' + d.x[l]).map(stem), tf = {};
+        toks.forEach(t => { tf[t] = (tf[t] || 0) + 1; });
+        Object.keys(tf).forEach(t => { df[l][t] = (df[l][t] || 0) + 1; });
+        docs[l].push({ d, tf, n: toks.length });
+      }
+    }
+    const search = q => {
+      const l = lang(), ds = docs[l], N = ds.length, avg = ds.reduce((a, b) => a + b.n, 0) / N;
+      const base = words(q).filter(w => !STOP.has(w));
+      const terms = [...new Set(base.flatMap(w => [w, ...(SYN[w] || [])]).map(stem))];
+      const seen = new Set();
+      return ds.map(x => {
+        let score = 0;
+        for (const t of terms) {
+          const f = x.tf[t]; if (!f) continue;
+          const idf = Math.log(1 + (N - df[l][t] + .5) / (df[l][t] + .5));
+          score += idf * (f * 2.2) / (f + 1.2 * (.25 + .75 * x.n / avg));
+        }
+        return { x, score };
+      }).filter(r => r.score > .4).sort((a, b) => b.score - a.score)
+        .filter(r => { const k = r.x.d.x[l]; if (seen.has(k)) return false; seen.add(k); return true; })
+        .slice(0, 3).map(r => ({ ...r.x.d, terms }));
+    };
+    const mark = (el, text, terms) => {
+      text.split(/(\s+)/).forEach(w => {
+        const hit = terms.includes(stem(norm(w).replace(/[^a-z0-9#+]/g, '')));
+        if (hit) { const m = document.createElement('mark'); m.textContent = w; el.append(m); } else el.append(w);
+      });
+    };
+    let last = '';
+    const render = q => {
+      last = q;
+      const box = $('#answers'), l = lang(); box.textContent = '';
+      const res = search(q);
+      if (!res.length) {
+        const p = document.createElement('p'); p.className = 'noanswer';
+        p.textContent = l === 'fr' ? 'Aucun passage du site ne parle de ce sujet. Essayez avec un nom d’entreprise, un projet ou une technologie.' : 'No passage on this site covers that topic. Try a company, a project or a technology.';
+        return box.append(p);
+      }
+      res.forEach((r, i) => {
+        const a = document.createElement('article'); a.className = 'answer';
+        const n = document.createElement('a'); n.className = 'cite'; n.href = '#' + r.s; n.textContent = `[${i + 1}] ${r.t[l]}`;
+        const p = document.createElement('p'); mark(p, r.x[l], r.terms);
+        a.append(n, p); box.append(a);
+      });
+    };
+    return { render, rerender() { if (last) render(last); } };
+  })();
+  const q = $('#q');
+  $('#ask-form').addEventListener('submit', e => { e.preventDefault(); if (q.value.trim()) Ask.render(q.value.trim()); else toast(tr('emptyq')); });
+  $$('[data-q]').forEach(b => b.addEventListener('click', () => { q.value = b.dataset.q; Ask.render(b.dataset.q); }));
+  const askDefault = () => { const b = $$('[data-q]').find(x => x.dataset.l === lang()); q.value = b.dataset.q; Ask.render(b.dataset.q); };
+  askDefault();
+  $('#lang').addEventListener('click', askDefault);
 
   const links = $$('[data-spy]');
   const spy = new IntersectionObserver(es => {

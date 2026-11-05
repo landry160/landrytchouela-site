@@ -188,3 +188,81 @@ export const nav = [
   { id: 'apropos', icon: 'user-round', label: { fr: 'À propos', en: 'About' } },
   { id: 'contact', icon: 'mail', label: { fr: 'Contact', en: 'Contact' } },
 ];
+
+// Études de cas : uniquement des faits vérifiés, jamais de résultat inventé.
+export const cases = {
+  Performia: {
+    id: 'performia', tone: 'orange',
+    context: { fr: 'La machine doit mesurer la force de l’athlète et ajuster la résistance en temps réel, pendant que plusieurs sous-systèmes échangent des données sans en perdre.', en: 'The machine has to measure the athlete’s force and adjust resistance in real time, while several subsystems exchange data without losing any.' },
+    flow: [
+      { t: { fr: 'Capteurs de force', en: 'Force sensors' }, d: 'HX711' },
+      { t: 'ESP32', d: { fr: 'FreeRTOS, 5 tâches sur 2 cœurs', en: 'FreeRTOS, 5 tasks on 2 cores' } },
+      { t: { fr: 'Lien de données', en: 'Data link' }, d: 'Manchester, CRC16, ARQ' },
+      { t: { fr: 'Écran tactile', en: 'Touchscreen' }, d: 'Nextion, UART' },
+    ],
+    decisions: [
+      { fr: 'Déporter le rendu graphique sur l’écran Nextion pour ne pas surcharger l’ESP32, qui gère déjà les capteurs et la boucle de contrôle.', en: 'Offload graphics rendering to the Nextion screen so the ESP32, already running the sensors and control loop, is not overloaded.' },
+      { fr: 'Protocole en cinq phases : initialisation, flux continu, détection de fautes, retransmission et fermeture.', en: 'Five-phase protocol: initialization, continuous flow, fault detection, retransmission and closure.' },
+      { fr: 'Code de remplacement basé sur RMT pour les tâches PHY_TX et PHY_RX.', en: 'RMT-based replacement code for the PHY_TX and PHY_RX tasks.' },
+    ],
+    outcome: { fr: 'Débit utile calculé d’environ 18 kbit/s. Le projet est toujours en cours.', en: 'Calculated useful throughput of about 18 kbit/s. The project is still in progress.' },
+  },
+  'Industrial RAG Assistant': {
+    id: 'rag', tone: 'violet',
+    context: { fr: 'Dans une usine, la réponse existe souvent déjà, mais elle est perdue dans des manuels, des procédures de maintenance et des fiches techniques. L’assistant doit répondre en montrant ses sources.', en: 'In a factory, the answer often already exists, but it is buried in manuals, maintenance procedures and datasheets. The assistant has to answer and show its sources.' },
+    flow: [
+      { t: 'Documents', d: { fr: 'Manuels, procédures, fiches', en: 'Manuals, procedures, datasheets' } },
+      { t: { fr: 'Ingestion', en: 'Ingestion' }, d: 'FastAPI' },
+      { t: { fr: 'Recherche vectorielle', en: 'Vector search' }, d: 'PostgreSQL, pgvector' },
+      { t: { fr: 'Réponse citée', en: 'Cited answer' }, d: 'Next.js' },
+    ],
+    decisions: [
+      { fr: 'Définir d’abord les frontières des services, le modèle de données et les contrats d’API v1 : ingest, ask et health.', en: 'Define service boundaries, the data model and the v1 API contracts first: ingest, ask and health.' },
+      { fr: 'Faire tourner tous les services avec Docker Compose.', en: 'Run all services through Docker Compose.' },
+      { fr: 'Rendre chaque réponse vérifiable en citant les passages sources.', en: 'Make every answer verifiable by citing its source passages.' },
+    ],
+    outcome: { fr: 'Le pipeline d’ingestion, de recherche et de génération citée est en cours de développement. Le déploiement est visé pour décembre 2026.', en: 'The ingestion, retrieval and cited-generation pipeline is in development. Deployment is targeted for December 2026.' },
+  },
+  GeoForce: {
+    id: 'geoforce', tone: 'green',
+    context: { fr: 'Suivre la présence des employés à partir de balises iBeacon, avec des services séparés pour le relais, l’archive et le contrôle.', en: 'Track employee presence from iBeacons, with separate services for relay, archiving and control.' },
+    flow: [
+      { t: 'ESP32', d: { fr: 'Scan BLE des balises', en: 'BLE beacon scan' } },
+      { t: { fr: 'Relais', en: 'Relay' }, d: 'Node.js, MQTT' },
+      { t: 'Archive', d: 'SQLite, HTTP' },
+      { t: { fr: 'Interface', en: 'Interface' }, d: 'Angular' },
+    ],
+    decisions: [
+      { fr: 'Publier les arrivées et les départs sur un broker MQTT pour découpler le capteur de l’archive.', en: 'Publish arrivals and departures to an MQTT broker to decouple the sensor from the archive.' },
+      { fr: 'Piloter une DEL à distance depuis l’interface, par un service de contrôle qui parle CoAP à l’ESP32.', en: 'Control an LED remotely from the interface, through a control service that speaks CoAP to the ESP32.' },
+    ],
+    challenges: [
+      { fr: 'Rôles CoAP inversés : l’ESP32 devait être le serveur et le service de contrôle, le client.', en: 'Inverted CoAP roles: the ESP32 had to be the server and the control service the client.' },
+      { fr: 'Chargement de Zone.js et erreurs de détection de changements dans Angular.', en: 'Zone.js loading and change detection errors in Angular.' },
+    ],
+  },
+  'Mini-Machine': {
+    id: 'minimachine', tone: 'slate',
+    context: { fr: 'Un projet personnel pour explorer comment combiner plusieurs signaux afin d’interpréter une scène, plutôt que de se limiter à une seule détection.', en: 'A personal project exploring how to combine several signals to interpret a scene, rather than relying on a single detection.' },
+    flow: [
+      { t: { fr: 'Vidéo et audio', en: 'Video and audio' }, d: 'OpenCV' },
+      { t: { fr: 'Détection', en: 'Detection' }, d: { fr: 'Personnes et mouvement', en: 'People and motion' } },
+      { t: { fr: 'Analyse de contexte', en: 'Context analysis' }, d: { fr: 'Mémoire contextuelle', en: 'Contextual memory' } },
+      { t: { fr: 'Score de risque', en: 'Risk score' }, d: 'Streamlit' },
+    ],
+    decisions: [
+      { fr: 'Conserver une mémoire contextuelle et un journal d’événements pour interpréter ce qui se passe dans le temps.', en: 'Keep contextual memory and an event log to interpret what happens over time.' },
+      { fr: 'Présenter le tout dans une interface Streamlit.', en: 'Present everything in a Streamlit interface.' },
+    ],
+  },
+};
+
+export const ask = {
+  title: { fr: 'Posez une question à mon parcours', en: 'Ask my background a question' },
+  lede: { fr: 'Le principe de mon assistant RAG, appliqué à ce site : votre question cherche les passages les plus pertinents, et chaque réponse cite sa source.', en: 'The idea behind my RAG assistant, applied to this site: your question retrieves the most relevant passages, and each answer cites its source.' },
+  note: { fr: 'Recherche par mots-clés calculée dans votre navigateur, sans modèle de langue. Le texte affiché vient du site, mot pour mot.', en: 'Keyword search computed in your browser, with no language model. The text shown comes from this site, word for word.' },
+  suggestions: {
+    fr: ['Quelle expérience en IA ?', 'Que faisait-il chez Thales ?', 'A-t-il dirigé une équipe ?', 'Temps réel et embarqué ?'],
+    en: ['What AI experience?', 'What did he do at Thales?', 'Has he led a team?', 'Real time and embedded?'],
+  },
+};

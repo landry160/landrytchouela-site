@@ -1,7 +1,7 @@
 // Génère public/ (le site à déployer) et artifact/ (l'aperçu Claude) à partir de content.mjs.
 import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, copyFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
-import { site, jobs, flagship, projects, others, chain, toolbox, about, nav } from './content.mjs';
+import { site, jobs, flagship, projects, others, chain, toolbox, about, nav, cases, ask } from './content.mjs';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const T = v => typeof v === 'string' ? esc(v) : `<span data-l="fr">${esc(v.fr)}</span><span data-l="en">${esc(v.en)}</span>`;
@@ -98,6 +98,7 @@ const flagTile = `
   </div>
   <div class="metrics">${flagship.metrics.map(m => `<div><b>${m.v}${m.u ? `<small>${m.u}</small>` : ''}</b><span>${T(m.l)}</span></div>`).join('')}</div>
   <div class="tags">${flagship.tags.map(tag).join('')}</div>
+  ${`<button class="tilelink casebtn" type="button" data-case="${cases[flagship.name].id}">${L('Lire l’étude de cas', 'Read the case study')}${icon('arrow-up-right')}</button>`}
 </article>`;
 
 const projTile = p => `
@@ -106,8 +107,50 @@ const projTile = p => `
   <h3>${esc(p.name)}</h3>
   <p>${T(p.desc)}</p>
   <div class="tags">${p.tags.map(tag).join('')}</div>
-  ${p.link ? `<a class="tilelink" href="${p.link.href}" target="_blank" rel="noopener">${T(p.link.label)}${icon('arrow-up-right')}</a>` : ''}
+  <div class="tileacts">${`<button class="tilelink casebtn" type="button" data-case="${cases[p.name].id}">${L('Lire l’étude de cas', 'Read the case study')}${icon('arrow-up-right')}</button>`}${p.link ? `<a class="tilelink" href="${p.link.href}" target="_blank" rel="noopener">${T(p.link.label)}${icon('arrow-up-right')}</a>` : ''}</div>
 </article>`;
+
+const list = (title, items) => items?.length ? `<section><h3>${title}</h3><ul>${items.map(i => `<li>${T(i)}</li>`).join('')}</ul></section>` : '';
+const allProjects = [flagship, ...projects];
+const dialogs = allProjects.map(p => { const c = cases[p.name]; return `
+<dialog class="case" id="case-${c.id}" aria-labelledby="case-${c.id}-t">
+  <div class="case-head tile-${c.tone}">
+    <div><p class="pill">${T(p.status)}</p><h2 id="case-${c.id}-t">${esc(p.name)}</h2></div>
+    <button class="iconbtn case-close" type="button" aria-label="Fermer / Close">${icon('x')}</button>
+  </div>
+  <div class="case-body">
+    <section><h3>${L('Le problème', 'The problem')}</h3><p>${T(c.context)}</p></section>
+    <section><h3>${L('Architecture', 'Architecture')}</h3>
+      <ol class="flow">${c.flow.map(f => `<li><b>${T(f.t)}</b><span>${T(f.d)}</span></li>`).join('')}</ol>
+    </section>
+    ${list(L('Décisions', 'Decisions'), c.decisions)}
+    ${list(L('Défis résolus', 'Challenges solved'), c.challenges || (p.fixed ?? null))}
+    ${c.outcome ? `<section><h3>${L('Où ça en est', 'Where it stands')}</h3><p>${T(c.outcome)}</p></section>` : ''}
+  </div>
+</dialog>`; }).join('');
+
+const askS = `
+<section class="section" id="interroger"><div class="wrap">
+  <div class="ask glass">
+    <div class="ask-intro">
+      <h2 class="h2 ask-h">${T(ask.title)}</h2>
+      <p class="lede">${T(ask.lede)}</p>
+    </div>
+    <form id="ask-form" autocomplete="off">
+      <label for="q">${L('Votre question', 'Your question')}</label>
+      <div class="askrow">
+        <input id="q" name="q" type="text" maxlength="120" spellcheck="false">
+        <button class="btn btn-ghost" type="submit">${icon('search')}${L('Chercher dans le parcours', 'Search my background')}</button>
+      </div>
+    </form>
+    <div class="suggest">
+      ${ask.suggestions.fr.map(q => `<button class="chip chipbtn" type="button" data-l="fr" data-q="${esc(q)}">${esc(q)}</button>`).join('')}
+      ${ask.suggestions.en.map(q => `<button class="chip chipbtn" type="button" data-l="en" data-q="${esc(q)}">${esc(q)}</button>`).join('')}
+    </div>
+    <div id="answers" class="answers" aria-live="polite"></div>
+    <p class="asknote">${T(ask.note)}</p>
+  </div>
+</div></section>`;
 
 const projectsS = `
 <section class="section" id="projets"><div class="wrap">
@@ -189,13 +232,27 @@ const body = `
 <a class="skip" href="#projets">${L('Aller au contenu', 'Skip to content')}</a>
 <div class="scene" aria-hidden="true"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div><div class="grain"></div></div>
 ${header}
-<main>${hero}${projectsS}${parcours}${skills}${aboutS}${contact}</main>
+<main>${hero}${askS}${projectsS}${parcours}${skills}${aboutS}${contact}</main>
 ${foot}
 ${navM}
+${dialogs}
 <div class="toasts" id="toasts" aria-live="polite"></div>`;
 
 const fonts = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&display=swap">`;
 const boot = `<script>(function(){var r=document.documentElement,t={},l;try{t=JSON.parse(localStorage.getItem('ui_theme')||'{}');l=localStorage.getItem('lang')}catch(e){}if(t.mode==='dark'||t.mode==='light')r.dataset.theme=t.mode;r.dataset.preset=t.preset||'ocean';var q=/[?&]lang=(en|fr)/.exec(location.search);r.lang=q?q[1]:l||((navigator.language||'fr').indexOf('fr')===0?'fr':'en')})()</script>`;
+
+const pick = v => typeof v === 'string' ? { fr: v, en: v } : v;
+const kb = [
+  ...jobs.flatMap(j => j.points.map(p => ({ s: 'parcours', t: pick(j.company), x: p }))),
+  { s: 'projets', t: pick(flagship.name), x: flagship.summary },
+  ...flagship.fixed.map(x => ({ s: 'projets', t: pick(flagship.name), x })),
+  ...allProjects.flatMap(p => { const c = cases[p.name]; return [c.context, ...c.decisions, ...(c.challenges || []), ...(c.outcome ? [c.outcome] : [])].map(x => ({ s: 'projets', t: pick(p.name), x })); }),
+  ...projects.map(p => ({ s: 'projets', t: pick(p.name), x: p.desc })),
+  ...others.map(o => ({ s: 'projets', t: pick(o.name), x: o.desc })),
+  ...about.facts.map(f => ({ s: 'apropos', t: f.k, x: f.v })),
+  ...about.body.map(x => ({ s: 'apropos', t: about.title, x })),
+];
+const kbTag = `<script type="application/json" id="kb">${JSON.stringify(kb).replace(/</g, '\\u003c')}</script>`;
 
 mkdirSync('.cache', { recursive: true });
 writeFileSync('.cache/page.html', body + readFileSync('src/app.js', 'utf8'));
@@ -214,11 +271,11 @@ const prod = `<!doctype html>
 <meta property="og:type" content="website"><meta property="og:url" content="${site.url}/"><meta property="og:title" content="Landry Tchouela"><meta property="og:description" content="${desc}"><meta property="og:image" content="${site.url}/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 ${boot}${fonts}<style>${css}</style></head>
-<body>${body}<script>${js}</script></body></html>`;
+<body>${body}${kbTag}<script>${js}</script></body></html>`;
 
 const preview = `<title>Landry Tchouela — Portfolio</title><meta name="claude:viewport-fit-sides" content="cover"><meta name="description" content="${desc}">
 ${boot}${fonts}<style>${css}</style>
-${body}<script>${js}</script>`;
+${body}${kbTag}<script>${js}</script>`;
 
 rmSync('public', { recursive: true, force: true });
 mkdirSync('public', { recursive: true }); mkdirSync('artifact', { recursive: true });
