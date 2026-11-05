@@ -8,6 +8,7 @@ export const site = {
   linkedin: 'https://www.linkedin.com/in/landrytchouela/',
   github: 'https://github.com/landry160',
   availability: { fr: 'Disponible pour un stage à l’été 2027', en: 'Available for a summer 2027 internship' },
+  position: { fr: 'INGÉNIEUR LOGICIEL · IA & SYSTÈMES INTELLIGENTS', en: 'SOFTWARE ENGINEER · AI & INTELLIGENT SYSTEMS' },
   thesis: { fr: 'Du capteur à l’IA, je bâtis le logiciel entre les deux.', en: 'From sensor to AI, I build the software in between.' },
   intro: {
     fr: 'Étudiant en génie informatique à l’Université de Sherbrooke. Je suis présentement stagiaire en développement logiciel chez Intelligence Industrielle, à Montréal, où je développe des applications et des fonctions d’IA générative pour le secteur manufacturier.',

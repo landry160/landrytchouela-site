@@ -41,8 +41,14 @@ const hero = `
   <h1 class="name"><span>Landry </span><span>Tchouela</span></h1>
   <div class="herorow">
     <div>
+      <p class="hero-position">${T(site.position)}</p>
       <p class="thesis">${T(site.thesis)}</p>
       <p class="intro">${T(site.intro)}</p>
+      <div class="proofline" aria-label="Expertise">
+        <span>${L('Logiciel full-stack', 'Full-stack software')}</span>
+        <i></i><span>${L('IA appliquée', 'Applied AI')}</span>
+        <i></i><span>${L('Systèmes industriels', 'Industrial systems')}</span>
+      </div>
     </div>
     <div class="herocta">
       <span class="avail"><span class="led"></span>${T(site.availability)}</span>
@@ -53,7 +59,7 @@ const hero = `
   <div class="scope" role="group" aria-labelledby="scope-t">
     <div class="scope-head">
       <div>
-        <h2 class="scope-title" id="scope-t">${L('Envoyez un message dans le lien de données de Performia', 'Send a message through the Performia data link')}</h2>
+        <h2 class="scope-title" id="scope-t">${L('Explorez une transmission de données en temps réel', 'Explore a real-time data transmission')}</h2>
         <p class="scope-sub">${L(
           'Simulation calculée dans votre navigateur : votre texte devient une trame réelle, codée en Manchester et protégée par un CRC-16. Le format est simplifié, le principe est celui que j’ai programmé sur ESP32.',
           'A simulation computed in your browser: your text becomes a real frame, Manchester-encoded and protected by a CRC-16. The format is simplified; the principle is the one I programmed on ESP32.')}</p>
@@ -203,9 +209,9 @@ execSync('npx tailwindcss -c tailwind.config.cjs -i src/styles.css -o .cache/sty
 const css = readFileSync('.cache/styles.css', 'utf8');
 const js = readFileSync('src/app.js', 'utf8');
 
-const title = 'Landry Tchouela | Génie informatique, logiciel et IA';
-const desc = 'Portfolio de Landry Tchouela, étudiant en génie informatique à l’Université de Sherbrooke : logiciel, IA et systèmes intelligents, du capteur au produit.';
-const ld = { '@context': 'https://schema.org', '@type': 'Person', name: 'Landry Tchouela', url: site.url, jobTitle: 'Computer engineering student', alumniOf: 'Cégep de Granby', affiliation: 'Université de Sherbrooke', sameAs: [site.linkedin, site.github] };
+const title = 'Landry Tchouela | Software Engineer — AI & Intelligent Systems';
+const desc = 'Portfolio de Landry Tchouela, étudiant en génie informatique à l’Université de Sherbrooke. Développement logiciel, IA appliquée et systèmes intelligents pour l’industrie.';
+const ld = { '@context': 'https://schema.org', '@type': 'Person', name: 'Landry Tchouela', url: site.url, jobTitle: 'Software Engineer — AI & Intelligent Systems', alumniOf: 'Cégep de Granby', affiliation: 'Université de Sherbrooke', sameAs: [site.linkedin, site.github] };
 
 const prod = `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
