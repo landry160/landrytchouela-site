@@ -8,6 +8,13 @@ Portfolio bilingue en un seul fichier HTML. Tout le texte est dans `content.mjs`
 2. Lancer `npm ci && node build.mjs` pour vérifier le résultat dans `public/index.html`.
 3. Pousser sur `main`. L'action GitHub reconstruit le site et publie `public/` sur la branche `deploy`, que Hostinger sert dans `public_html`.
 
+## Déploiement
+
+- Dépôt : `landry160/landrytchouela-site`. Le code est sur `main`, le site généré sur `deploy`.
+- Hostinger déploie automatiquement `deploy` vers landrytchouela.com (forfait Business, compte `u248372264`).
+- Il suffit de pousser sur `main`. Après une mise à jour, vider le cache avec `hosting_cache_clear`.
+- `orchid-whale-150919.hostingersite.com` reçoit les mêmes publications et sert d'aperçu. C'est le site principal du compte : ne pas le supprimer sans vérifier l'effet sur landrytchouela.com.
+
 ## Structure
 
 - `content.mjs` : tout le contenu FR/EN
